@@ -4,15 +4,15 @@ use std::ops::Add;
 
 type Graph<V, E> = BTreeMap<V, BTreeMap<V, E>>;
 
-/// Performs the Floyd-Warshall algorithm on the input graph
-/// The graph is a weighted, directed graph with no negative cycles
+/// Performs the Floyd-Warshall algorithm on the input graph.\
+/// The graph is a weighted, directed graph with no negative cycles.
 ///
-/// Returns a map storing the distance from each node to all the others
-/// I.e. For each vertex u, map[u][v] == Some(distance) means
+/// Returns a map storing the distance from each node to all the others.\
+/// i.e. For each vertex `u`, `map[u][v] == Some(distance)` means
 /// distance is the sum of the weights of the edges on the shortest path
-/// from u to v
+/// from `u` to `v`.
 ///
-/// For a key v, if map[v].len() == 0, then v cannot reach any other vertex, but is in the graph
+/// For a key `v`, if `map[v].len() == 0`, then `v` cannot reach any other vertex, but is in the graph
 /// (island node, or sink in the case of a directed graph)
 pub fn floyd_warshall<V: Ord + Copy, E: Ord + Copy + Add<Output = E> + num_traits::Zero>(
     graph: &Graph<V, E>,
@@ -36,7 +36,7 @@ pub fn floyd_warshall<V: Ord + Copy, E: Ord + Copy + Add<Output = E> + num_trait
     let keys = map.keys().copied().collect::<Vec<_>>();
     for &k in &keys {
         for &i in &keys {
-            if map[&i].get(&k).is_none() {
+            if !map[&i].contains_key(&k) {
                 continue;
             }
             for &j in &keys {
@@ -71,7 +71,7 @@ mod tests {
     use std::collections::BTreeMap;
 
     fn add_edge<V: Ord + Copy, E: Ord + Copy>(graph: &mut Graph<V, E>, v1: V, v2: V, c: E) {
-        graph.entry(v1).or_insert_with(BTreeMap::new).insert(v2, c);
+        graph.entry(v1).or_default().insert(v2, c);
     }
 
     fn bi_add_edge<V: Ord + Copy, E: Ord + Copy>(graph: &mut Graph<V, E>, v1: V, v2: V, c: E) {

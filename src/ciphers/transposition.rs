@@ -5,22 +5,22 @@
 //! original message. The most commonly referred to Transposition Cipher is the
 //! COLUMNAR TRANSPOSITION cipher, which is demonstrated below.
 
-use std::ops::Range;
+use std::ops::RangeInclusive;
 
 /// Encrypts or decrypts a message, using multiple keys. The
 /// encryption is based on the columnar transposition method.
 pub fn transposition(decrypt_mode: bool, msg: &str, key: &str) -> String {
-    let key_uppercase: String = key.to_uppercase();
+    let key_uppercase = key.to_uppercase();
     let mut cipher_msg: String = msg.to_string();
 
-    let keys: Vec<&str> = match decrypt_mode {
-        false => key_uppercase.split_whitespace().collect(),
-        true => key_uppercase.split_whitespace().rev().collect(),
+    let keys: Vec<&str> = if decrypt_mode {
+        key_uppercase.split_whitespace().rev().collect()
+    } else {
+        key_uppercase.split_whitespace().collect()
     };
 
     for cipher_key in keys.iter() {
         let mut key_order: Vec<usize> = Vec::new();
-        let mut counter: u8 = 0;
 
         // Removes any non-alphabet characters from 'msg'
         cipher_msg = cipher_msg
@@ -36,10 +36,9 @@ pub fn transposition(decrypt_mode: bool, msg: &str, key: &str) -> String {
 
         key_ascii.sort_by_key(|&(_, key)| key);
 
-        key_ascii.iter_mut().for_each(|(_, key)| {
-            *key = counter;
-            counter += 1;
-        });
+        for (counter, (_, key)) in key_ascii.iter_mut().enumerate() {
+            *key = counter as u8;
+        }
 
         key_ascii.sort_by_key(|&(index, _)| index);
 
@@ -49,9 +48,10 @@ pub fn transposition(decrypt_mode: bool, msg: &str, key: &str) -> String {
 
         // Determines whether to encrypt or decrypt the message,
         // and returns the result
-        cipher_msg = match decrypt_mode {
-            false => encrypt(cipher_msg, key_order),
-            true => decrypt(cipher_msg, key_order),
+        cipher_msg = if decrypt_mode {
+            decrypt(cipher_msg, key_order)
+        } else {
+            encrypt(cipher_msg, key_order)
         };
     }
 
@@ -63,7 +63,7 @@ fn encrypt(mut msg: String, key_order: Vec<usize>) -> String {
     let mut encrypted_msg: String = String::from("");
     let mut encrypted_vec: Vec<String> = Vec::new();
 
-    let msg_len: usize = msg.len();
+    let msg_len = msg.len();
     let key_len: usize = key_order.len();
 
     let mut msg_index: usize = msg_len;
@@ -77,7 +77,7 @@ fn encrypt(mut msg: String, key_order: Vec<usize>) -> String {
 
         // Loop every nth character, determined by key length, to create a column
         while index < msg_index {
-            let ch: char = msg.remove(index);
+            let ch = msg.remove(index);
             chars.push(ch);
 
             index += key_index;
@@ -91,18 +91,16 @@ fn encrypt(mut msg: String, key_order: Vec<usize>) -> String {
     // alphabetical order of the keyword's characters
     let mut indexed_vec: Vec<(usize, &String)> = Vec::new();
     let mut indexed_msg: String = String::from("");
-    let mut counter: usize = 0;
 
-    key_order.into_iter().for_each(|key_index| {
+    for (counter, key_index) in key_order.into_iter().enumerate() {
         indexed_vec.push((key_index, &encrypted_vec[counter]));
-        counter += 1;
-    });
+    }
 
     indexed_vec.sort();
 
-    indexed_vec.into_iter().for_each(|(_, column)| {
+    for (_, column) in indexed_vec {
         indexed_msg.push_str(column);
-    });
+    }
 
     // Split the message by a space every nth character, determined by
     // 'message length divided by keyword length' to the next highest integer.
@@ -127,7 +125,7 @@ fn decrypt(mut msg: String, key_order: Vec<usize>) -> String {
     let mut decrypted_vec: Vec<String> = Vec::new();
     let mut indexed_vec: Vec<(usize, String)> = Vec::new();
 
-    let msg_len: usize = msg.len();
+    let msg_len = msg.len();
     let key_len: usize = key_order.len();
 
     // Split the message into columns, determined by 'message length divided by keyword length'.
@@ -144,8 +142,8 @@ fn decrypt(mut msg: String, key_order: Vec<usize>) -> String {
 
     split_large.iter_mut().rev().for_each(|key_index| {
         counter -= 1;
-        let range: Range<usize> =
-            ((*key_index * split_size) + counter)..(((*key_index + 1) * split_size) + counter + 1);
+        let range: RangeInclusive<usize> =
+            ((*key_index * split_size) + counter)..=(((*key_index + 1) * split_size) + counter);
 
         let slice: String = msg[range.clone()].to_string();
         indexed_vec.push((*key_index, slice));
@@ -153,19 +151,19 @@ fn decrypt(mut msg: String, key_order: Vec<usize>) -> String {
         msg.replace_range(range, "");
     });
 
-    split_small.iter_mut().for_each(|key_index| {
+    for key_index in split_small.iter_mut() {
         let (slice, rest_of_msg) = msg.split_at(split_size);
         indexed_vec.push((*key_index, (slice.to_string())));
         msg = rest_of_msg.to_string();
-    });
+    }
 
     indexed_vec.sort();
 
-    key_order.into_iter().for_each(|key| {
+    for key in key_order {
         if let Some((_, column)) = indexed_vec.iter().find(|(key_index, _)| key_index == &key) {
             decrypted_vec.push(column.to_string());
         }
-    });
+    }
 
     // Concatenate the columns into a string, determined by the
     // alphabetical order of the keyword's characters

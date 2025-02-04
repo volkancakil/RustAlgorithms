@@ -51,9 +51,8 @@ impl AhoCorasick {
                                 child.lengths.extend(node.borrow().lengths.clone());
                                 child.suffix = Rc::downgrade(node);
                                 break;
-                            } else {
-                                suffix = suffix.unwrap().borrow().suffix.upgrade();
                             }
+                            suffix = suffix.unwrap().borrow().suffix.upgrade();
                         }
                     }
                 }
@@ -65,7 +64,7 @@ impl AhoCorasick {
         let mut ans = vec![];
         let mut cur = Rc::clone(&self.root);
         let mut position: usize = 0;
-        for (_, c) in s.chars().enumerate() {
+        for c in s.chars() {
             loop {
                 if let Some(child) = Rc::clone(&cur).borrow().trans.get(&c) {
                     cur = Rc::clone(child);

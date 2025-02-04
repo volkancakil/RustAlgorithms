@@ -12,11 +12,9 @@ fn variable(var: i64) -> usize {
     }
 }
 
-/// Returns an assignment that satisfies all the constraints, or a variable
-/// that makes such an assignment impossible. Variables should be numbered
-/// from 1 to n, and a negative number -m corresponds to the negated variable
-/// m. For more information about this problem, please visit:
-/// https://en.wikipedia.org/wiki/2-satisfiability
+/// Returns an assignment that satisfies all the constraints, or a variable that makes such an assignment impossible.\
+/// Variables should be numbered from 1 to `n`, and a negative number `-m` corresponds to the negated variable `m`.\
+/// For more information about this problem, please visit: <https://en.wikipedia.org/wiki/2-satisfiability>
 pub fn solve_two_satisfiability(
     expression: &[Condition],
     num_variables: usize,
@@ -26,12 +24,12 @@ pub fn solve_two_satisfiability(
     let mut sccs = SCCs::new(num_verts);
     let mut adj = Graph::new();
     adj.resize(num_verts, vec![]);
-    expression.iter().for_each(|cond| {
+    for cond in expression.iter() {
         let v1 = variable(cond.0);
         let v2 = variable(cond.1);
         adj[v1 ^ 1].push(v2);
         adj[v2 ^ 1].push(v1);
-    });
+    }
     sccs.find_components(&adj);
     result.resize(num_variables + 1, false);
     for var in (2..num_verts).step_by(2) {

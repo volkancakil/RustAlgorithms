@@ -76,6 +76,12 @@ impl LinearSieve {
     }
 }
 
+impl Default for LinearSieve {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::LinearSieve;
@@ -109,7 +115,7 @@ mod tests {
             let factorization = ls.factorize(i).unwrap();
             let mut product = 1usize;
             for (idx, p) in factorization.iter().enumerate() {
-                assert!(ls.primes.binary_search(&p).is_ok());
+                assert!(ls.primes.binary_search(p).is_ok());
                 product *= *p;
                 if idx > 0 {
                     assert!(*p >= factorization[idx - 1]);

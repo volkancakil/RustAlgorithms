@@ -77,7 +77,7 @@ mod tests {
     }
     #[test]
     fn basic_tv1() {
-        let mut mac = Poly1305::new();
+        let mut mac = Poly1305::default();
         let key: [u8; 32] = [
             0x85, 0xd6, 0xbe, 0x78, 0x57, 0x55, 0x6d, 0x33, 0x7f, 0x44, 0x52, 0xfe, 0x42, 0xd5,
             0x06, 0xa8, 0x01, 0x03, 0x80, 0x8a, 0xfb, 0x0d, 0xb2, 0xfd, 0x4a, 0xbf, 0xf6, 0xaf,
@@ -91,7 +91,7 @@ mod tests {
         mac.add_msg(&tmp_buffer, 2);
         let result = mac.get_tag();
         assert_eq!(
-            get_tag_hex(&result.as_slice()),
+            get_tag_hex(result.as_slice()),
             "a8061dc1305136c6c22b8baf0c0127a9"
         );
     }

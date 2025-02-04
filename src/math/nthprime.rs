@@ -1,5 +1,5 @@
 // Generate the nth prime number.
-// Algorithm is inspired by the the optimized version of the Sieve of Eratosthenes.
+// Algorithm is inspired by the optimized version of the Sieve of Eratosthenes.
 pub fn nthprime(nth: u64) -> u64 {
     let mut total_prime: u64 = 0;
     let mut size_factor: u64 = 2;
@@ -39,8 +39,8 @@ fn get_primes(s: u64) -> Vec<u64> {
 
 fn count_prime(primes: Vec<u64>, n: u64) -> Option<u64> {
     let mut counter: u64 = 0;
-    for i in 2..primes.len() {
-        counter += primes.get(i).unwrap();
+    for (i, prime) in primes.iter().enumerate().skip(2) {
+        counter += prime;
         if counter == n {
             return Some(i as u64);
         }

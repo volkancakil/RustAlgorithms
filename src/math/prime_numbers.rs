@@ -4,9 +4,9 @@ pub fn prime_numbers(max: usize) -> Vec<usize> {
     if max >= 2 {
         result.push(2)
     }
-    for i in (3..max + 1).step_by(2) {
+    for i in (3..=max).step_by(2) {
         let stop: usize = (i as f64).sqrt() as usize + 1;
-        let mut status: bool = true;
+        let mut status = true;
 
         for j in (3..stop).step_by(2) {
             if i % j == 0 {

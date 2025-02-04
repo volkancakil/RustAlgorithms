@@ -17,9 +17,11 @@ Please delete options that are not relevant.
 ## Checklist:
 
 - [ ] I ran bellow commands using the latest version of **rust nightly**.
-- [ ] I ran `cargo clippy --all -- -D warning` just before my last commit and fixed any issue that was found.
+- [ ] I ran `cargo clippy --all -- -D warnings` just before my last commit and fixed any issue that was found.
 - [ ] I ran `cargo fmt` just before my last commit.
 - [ ] I ran `cargo test` just before my last commit and all tests passed.
+- [ ] I added my algorithm to the corresponding `mod.rs` file within its own folder, and in any parent folder(s).
+- [ ] I added my algorithm to `DIRECTORY.md` with the correct link.
 - [ ] I checked `COUNTRIBUTING.md` and my code follows its guidelines.
 
 Please make sure that if there is a test that takes too long to run ( > 300ms), you `#[ignore]` that or

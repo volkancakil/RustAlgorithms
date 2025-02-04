@@ -8,15 +8,14 @@ pub fn encode(message: &str) -> String {
     let dictionary = _morse_dictionary();
     message
         .chars()
-        .into_iter()
         .map(|char| char.to_uppercase().to_string())
         .map(|letter| dictionary.get(letter.as_str()))
-        .map(|option| option.unwrap_or(&UNKNOWN_CHARACTER).to_string())
+        .map(|option| (*option.unwrap_or(&UNKNOWN_CHARACTER)).to_string())
         .collect::<Vec<String>>()
         .join(" ")
 }
 
-// Declaritive macro for creating readable map declarations, for more info see https://doc.rust-lang.org/book/ch19-06-macros.html
+// Declarative macro for creating readable map declarations, for more info see https://doc.rust-lang.org/book/ch19-06-macros.html
 macro_rules! map {
     ($($key:expr => $value:expr),* $(,)?) => {
         std::iter::Iterator::collect(IntoIterator::into_iter([$(($key, $value),)*]))
@@ -90,18 +89,14 @@ fn _check_all_parts(string: &str) -> bool {
 }
 
 fn _decode_token(string: &str) -> String {
-    _morse_to_alphanumeric_dictionary()
+    (*_morse_to_alphanumeric_dictionary()
         .get(string)
-        .unwrap_or(&_UNKNOWN_MORSE_CHARACTER)
-        .to_string()
+        .unwrap_or(&_UNKNOWN_MORSE_CHARACTER))
+    .to_string()
 }
 
 fn _decode_part(string: &str) -> String {
-    string
-        .split(' ')
-        .map(_decode_token)
-        .collect::<Vec<String>>()
-        .join("")
+    string.split(' ').map(_decode_token).collect::<String>()
 }
 
 /// Convert morse code to ascii.
@@ -173,12 +168,7 @@ mod tests {
     #[test]
     fn decrypt_valid_character_set_invalid_morsecode() {
         let expected = format!(
-            "{}{}{}{} {}",
-            _UNKNOWN_MORSE_CHARACTER,
-            _UNKNOWN_MORSE_CHARACTER,
-            _UNKNOWN_MORSE_CHARACTER,
-            _UNKNOWN_MORSE_CHARACTER,
-            _UNKNOWN_MORSE_CHARACTER,
+            "{_UNKNOWN_MORSE_CHARACTER}{_UNKNOWN_MORSE_CHARACTER}{_UNKNOWN_MORSE_CHARACTER}{_UNKNOWN_MORSE_CHARACTER} {_UNKNOWN_MORSE_CHARACTER}",
         );
 
         let encypted = ".-.-.--.-.-. --------. ..---.-.-. .-.-.--.-.-. / .-.-.--.-.-.".to_string();

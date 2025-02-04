@@ -28,7 +28,7 @@ impl<T> PartialEq for HuffmanNode<T> {
 
 impl<T> PartialOrd for HuffmanNode<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.frequency.cmp(&other.frequency).reverse())
+        Some(self.cmp(other))
     }
 }
 
@@ -111,7 +111,7 @@ impl<T: Clone + Copy + Ord> HuffmanDictionary<T> {
     pub fn encode(&self, data: &[T]) -> HuffmanEncoding {
         let mut result = HuffmanEncoding::new();
         data.iter()
-            .for_each(|value| result.add_data(*self.alphabet.get(value).unwrap()));
+            .for_each(|value| result.add_data(self.alphabet[value]));
         result
     }
 }
@@ -155,9 +155,10 @@ impl HuffmanEncoding {
                 result.push(state.symbol.unwrap());
                 state = &dict.root;
             }
-            match self.get_bit(i) {
-                false => state = state.left.as_ref().unwrap(),
-                true => state = state.right.as_ref().unwrap(),
+            state = if self.get_bit(i) {
+                state.right.as_ref().unwrap()
+            } else {
+                state.left.as_ref().unwrap()
             }
         }
         if self.num_bits > 0 {
